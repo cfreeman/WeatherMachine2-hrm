@@ -21,10 +21,10 @@ package main
 
 import (
 	"encoding/binary"
-	"log"
-	"fmt"
-	"strings"
 	"flag"
+	"fmt"
+	"log"
+	"strings"
 
 	"github.com/cfreeman/gatt"
 	"github.com/cfreeman/gatt/examples/option"
@@ -127,7 +127,7 @@ func onPeriphConnected(p gatt.Peripheral, done chan bool, err error) {
 	}
 
 	// Wait till we are disconnected from the HRM.
-	<- done
+	<-done
 }
 
 // onPeriphDisconnected is called when a BLE Peripheral is disconnected.
