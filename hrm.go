@@ -71,8 +71,6 @@ func onPeriphConnected(p gatt.Peripheral, done chan bool, err error) {
 	log.Println("INFO:CONNECTED")
 	log.Println()
 
-	firstConnected := true
-
 	defer p.Device().CancelConnection(p)
 
 	if err := p.SetMTU(500); err != nil {
@@ -116,18 +114,13 @@ func onPeriphConnected(p gatt.Peripheral, done chan bool, err error) {
 
 				err := p.SetNotifyValue(c, func(c *gatt.Characteristic, b []byte, err error) {
 					heartRate := binary.LittleEndian.Uint16(append([]byte(b[1:2]), []byte{0}...))
+					contact := binary.LittleEndian.Uint16(append([]byte(b[0:1]), []byte{0, 0}...))
 
-					// Override the heartrate on connection, and send dummy value to show
-					// that we have paired with the HRM.
-					if firstConnected && heartRate == 0 {
-						fmt.Println(-1)
+					// Notify if the HRM has skin contact, and the current measured Heart rate.
+					if contact == 6 || contact == 22 {
+						fmt.Printf("1,%d\n", heartRate)
 					} else {
-						fmt.Println(heartRate)
-					}
-
-					// As soon as we have connected, we no longer have firstConnected.
-					if firstConnected && heartRate > 0 {
-						firstConnected = false
+						fmt.Printf("0,%d\n", heartRate)
 					}
 				})
 
