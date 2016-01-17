@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	"github.com/cfreeman/gatt"
@@ -147,8 +148,14 @@ func onPeriphDisconnected(p gatt.Peripheral, done chan bool, err error) {
 // pollHeartRateMonitor connects to the BLE heart rate monitor at deviceID and
 // collects heart rate measurements on the channel hr.
 func main() {
-	var deviceID string
+	f, err := os.OpenFile("WeatherMachine2-hrm.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		return // Ah-oh. Unable to log to file.
+	}
+	defer f.Close()
+	log.SetOutput(f)
 
+	var deviceID string
 	flag.StringVar(&deviceID, "deviceID", "h", "The ID of the bluetooth heart rate monitor.")
 	flag.Parse()
 
